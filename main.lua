@@ -36,36 +36,50 @@ function love.draw()
 
     love.graphics.draw(sprites.sky,0,0)
 
+    love.graphics.setColor(1,1,1)
+    love.graphics.setFont(gameFont) 
+
+    love.graphics.print("Score: " .. score,5,5)
+    
     if gameState == 2 then 
         love.graphics.draw(sprites.target, target.x - target.radius, target.y- target.radius)
+        love.graphics.printf("Timer: " .. math.ceil(timer), -10, 5, love.graphics.getWidth(), "right")
     end
 
     if gameState == 1 then
         love.graphics.printf("Click anywhere to get shoot'in!", 0, 250, love.graphics.getWidth(), "center" )
-        
     end
-
-    love.graphics.setColor(1,1,1)
-    love.graphics.setFont(gameFont)
-    love.graphics.print("Score: " .. score,5,5)
-    love.graphics.printf("Timer: " .. math.ceil(timer), -10, 5, love.graphics.getWidth(), "right")
 
     love.graphics.draw(sprites.crosshair, love.mouse.getX() - 20 , love.mouse.getY() - 20)
     
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
+    local mouseDistance = distanceBetween(target.x, target.y, x, y)
+
     if button == 1 and gameState == 2 then
-        if distanceBetween(target.x, target.y, x, y) <= target.radius then
+        if mouseDistance <= target.radius then
             score = score + 1
             target.x = math.random(target.radius, love.graphics.getWidth() - target.radius)
             target.y = math.random(target.radius, love.graphics.getHeight() - target.radius)
+        elseif score > 0 then
+            score = score - 1
         end 
 
     elseif button == 1 and gameState == 1 then
         gameState = 2
         timer = 10
         score = 0
+
+    elseif button == 2 and gameState == 2 then
+        if mouseDistance <= target.radius then
+            score = score + 3
+            target.x = math.random(target.radius, love.graphics.getWidth() - target.radius)
+            target.y = math.random(target.radius, love.graphics.getHeight() - target.radius)
+            timer = timer - 1
+        elseif score > 0 then
+            score = score - 1
+        end
     end 
 end
 
